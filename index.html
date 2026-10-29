@@ -123,26 +123,58 @@
             background-color: #f2f2f2;
             color: #333;
         }
+        /* ===== Added Oct 2026: iframe auto-height + mobile layout ===== */
+        .search-row { display: flex; gap: 6px; }
+        .search-row input { flex: 1; margin-bottom: 10px; }
+        .search-btn { padding: 8px 12px; background: #800000; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 10px; font-size: 0.95em; }
+        .search-btn:hover { background: #5c0000; }
+        #search-info { font-size: 0.9em; color: #555; margin-bottom: 10px; min-height: 1em; }
+
+        .toc summary { cursor: pointer; font-weight: bold; color: #800000; font-size: 1.05em; margin-bottom: 10px; }
+
+        /* Floating Prev/Next bar that appears beside the current search match */
+        #match-bar { display: none; position: absolute; z-index: 1001; background: #fff; border: 1px solid #800000; border-radius: 6px; padding: 6px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 0.9em; align-items: center; gap: 6px; }
+        #match-bar button { padding: 4px 10px; cursor: pointer; }
+
+        /* Version tag sits at the bottom of the page (a fixed tag does not work in an auto-height iframe) */
+        .version-tag { position: static; display: block; width: fit-content; margin: 30px 0 0 auto; }
+
+        /* Phones and narrow screens: one column, contents menu on top and collapsed */
+        @media (max-width: 900px) {
+            body { padding: 12px; }
+            .main-container { grid-template-columns: 1fr; gap: 20px; }
+            .sidebar { position: static; max-height: none; overflow: visible; padding: 15px; }
+            h1 { font-size: 1.5em; }
+            table.standard-table th, table.standard-table td { padding: 6px; font-size: 0.9em; }
+        }
     </style>
+    <!-- Concordia AEM iframe auto-height (from concordia.ca/web/design/components/iframe.html). Do not remove. -->
+    <script type="text/javascript" src="https://www.concordia.ca/etc/designs/concordia/clientlibs/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 </head>
 <body>
 
    <header>
         <h1>GPE Graduate Student Handbook (M.Sc. and Ph.D.)</h1>
-        <p>Updated oct 29, 2026 </p>
+        <p>Updated Oct 29, 2026</p>
     </header>
 
     <div class="main-container">
         <aside class="sidebar">
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search handbook." onkeyup="if(event.key === 'Enter') executeSearch()">
+                <div class="search-row">
+                    <input type="search" id="search-input" placeholder="Search handbook" aria-label="Search handbook" onkeyup="if(event.key === 'Enter') executeSearch()">
+                    <button class="search-btn" onclick="executeSearch()">Search</button>
+                </div>
                 <button class="reset-btn" onclick="clearHighlights()">Reset Search</button>
+                <div id="search-info" aria-live="polite"></div>
                 <div id="nav-controls">
-<button onclick="jumpPrev()">Prev</button>
+                    <button onclick="jumpPrev()">Prev</button>
                     <button onclick="jumpNext()">Next</button>
                 </div>
             </div>
 
+            <details class="toc" id="toc" open>
+            <summary>Contents</summary>
             <ul class="nav-links">
                 <li><a href="#sec1">1. Consultation</a></li>
                 <li><a href="#sec2">2. M.Sc. and Ph.D. program objectives</a></li>
@@ -192,6 +224,7 @@
                 <li><a href="#sec10">10. Policy on Office Space for M.Sc. and Ph.D. Students</a></li>
                 <li style="margin-top: 20px; font-weight: bold; border-top: 1px solid #ddd; padding-top: 10px;"><a href="#sec-index">Alphabetical Index</a></li>
             </ul>
+            </details>
         </aside>
 
         <main class="content-area" id="content-area">
@@ -202,14 +235,14 @@
     
     		<p><strong>Graduate Program Assistant:</strong> Jennifer Srey (jennifer.srey@concordia.ca) The Graduate Program Assistant (GPA) assists with registration and performs all administrative and admission duties for the department's graduate students. The GPA follows students' progress throughout their residency, maintains and updates all graduate students' files, and notifies the Graduate Program Director of any potential problems. The GPA advises students regarding academic deadlines, procedures and awards, comprehensive exams and thesis defences, grade sheets, and prepares student requests on behalf of graduate students. The GPA answers general questions students might have about the programs and consults the Graduate Program Director when necessary. <a href="https://bookings.cloud.microsoft/book/DepartmentofGeographyPlanningandEnvironment@liveconcordia.onmicrosoft.com/?ismsaljsauthenabled=true" target="_blank">Students can make in-person or online appointments to meet with the GPA at any time during their studies.</a></p>
    			 
-				<button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+				<button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
 	</section>
 
 	<section id="sec2">
    	  <h2>2. M.Sc. and Ph.D. program objectives</h2>
     	<p>The M.Sc. and Ph.D. programs are designed to provide students with the theoretical foundations and methodological tools necessary to contribute to the understanding of human and environmental systems. Through an emphasis on both specialized and interdisciplinary perspectives, students are given the opportunity to carry out in-depth research work in any of the Department's areas of specialization covering three broad categories of environment: the natural or biophysical environment; the human, cultural or behavioural environment; and the urban, built or designed environment. In addition to contributing to the advancement of knowledge, students will be well placed to enter a wide range of careers in environmental, urban planning and public policy fields.</p>
     	
-		<button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+		<button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
 	</section>
 
 	<section id="sec3">
@@ -237,35 +270,41 @@
     	<h3 id="sec3-4">3.4 Language Proficiency Requirements for all Degrees</h3>
     	<p>The language of instruction at Concordia is English. Any student whose first language is other than English must demonstrate proficiency in English. Several proficiency tests are accepted.</p><p>Additional information on accepted tests and their scores can be found here:<a href="https://www.concordia.ca/gradstudies/future-students/how-to-apply/english-language-proficiency.html" target="_blank"> English Language Proficiency.</a></p>
     
-			<button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+			<button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
 </section>
 
 	<section id="sec4">
 <h2>4. Academic Regulations</h2>
     	<p><strong>GPA Maintenance Requirement.</strong> The academic progress of students is monitored at the end of each term. To continue in the program, students must remain in good academic standing, which is to maintain an assessment grade point average (AGPA) of at least 3.00 on a minimum of 12 credits. Students whose AGPA falls below 3.00 are considered to be on academic probation. Students whose AGPA falls below 3.00 for any two review periods are considered to be in failed standing.</p>
    	
-	<section id="sec4.1">
+	<div id="sec4.1">
     	<p><strong>C Rule.</strong> Graduate students who receive a grade of C for any course during their studies will be required to attend a review meeting with the Graduate Program Director. The decision as to whether or not the student will continue in the program rests with the Program Director. After the aforementioned meeting, if a continuation is granted, a request will be made to the School of Graduate Studies. Students who receive more than one grade of C for multiple courses during their studies will be withdrawn from the program. Students who have been withdrawn may request readmission. If readmitted and&nbsp; another grade of C is obtained after readmission, the student will be withdrawn from the program, and will not be considered for readmission again.</p>
    	
-	<section id="sec4.2"> 
+	</div>
+	<div id="sec4.2">
 <p><strong>F Rule.</strong> Students who receive a failing grade in any course during their studies will be withdrawn from the program, unless a continuation in the program is requested by the Program Director and approved by the Dean of Graduate Studies. If withdrawn, students may apply for readmission. Students who receive another failing grade after readmission will be withdrawn from the program and will not be reconsidered for readmission again.</p>
    	
-	<section id="sec4.3">
+	</div>
+	<div id="sec4.3">
     	<p><strong>Duration of Programs.</strong> It is expected that full-time students will complete the requirements for most master's/magisteriate degree programs within 6 terms (2 years). The expected time to completion for a doctoral degree for full-time students is 12 terms (4 years).</p>
    	
-	<section id="sec4.4">  
+	</div>
+	<div id="sec4.4">
     	<p><strong>Time Limit.</strong> Program time limits indicate the maximum program duration specified by the university. The time limit for a master's/magisteriate degree for full-time students is 9 terms (3 years), and for part-time students is 15 terms (5 years). The time limit for a doctoral degree is 18 terms (6 years) of full-time study, or 24 terms (8 years) of part-time study. A change of status once you have begun your degree does not equate to additional terms within your time limit. The number of remaining terms will be calculated by the Office of the Registrar and pro-rated. Every effort should be made to complete a thesis within the time limit provided. In exceptional circumstances a time limit extension may be requested, and upon recommendation of the GPD and approval by the School of Graduate Studies, short extensions may be permitted.</p>
    	
-	<section id="sec4.5"> 
+	</div>
+	<div id="sec4.5">
 <p><strong>Graduation Requirement.</strong> In order to graduate, students must have a cumulative GPA of at least 3.00.</p>
     
-	<section id="sec4.6">	
+	</div>
+	<div id="sec4.6">
     	<p><strong>Generative Artificial Intelligence (AI).</strong> As pointed out by Concordia's Centre for Teaching and Learning (CTL), within the complex landscape of GenAI integration in higher education, it is essential to find a balance between "the pedagogical benefits and ethical challenges" of GenAI capabilities (e.g. ChatGPT). To help find this balance, the CTL proposes a framework and some guidelines. Graduate students and supervisors are encouraged to read this document and to CLEARLY DEFINE what is permitted - or not - in terms of the use of GenAI, before commencing each major requirement of the graduate program.</p>
 		<p>Students who want to use GenAI for certain aspects of their research should first discuss this possibility with their supervisor and the committee members. If the student, the supervisor, and the committee members agree on the relevance of the use of GenAI for the student's research, they need to clearly define the extent and the limits of this use. This agreement could range from a simple sentence (e.g. "I plan to use ChatGPT only to edit the language of the final version of my manuscript") to a much more detailed document for a project in which GenAI might play a more central role. This agreement and a detailed description of how GenAI has been used throughout the research should appear clearly in the final thesis (e.g. which tools were used? To perform which tasks? Using which prompts?)</p>
 		
 		<p>For more information about how to use GenAI in higher education and at Concordia please refer to the framework and guidelines produced by the CTL: <a href="https://www.concordia.ca/ctl/tech-tools/teach-with-technology/guidelines-gen-ai.html" target="_blank">Guidelines on GenAI</a></p>
 
-		<button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+	</div>
+		<button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
    
 		
 	</section>
@@ -307,7 +346,7 @@
                     
                    
                 </ul>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
 
             <section id="sec6">
@@ -319,8 +358,7 @@
                     <li>9 credits: HENV 801, HENV 802, HENV 805.</li>
                     <li>6 credits in elective courses chosen from: HENV 605, HENV 610, HENV 620, HENV 625, HENV 630, HENV 635, HENV 640, HENV 645, HENV 650, HENV 655, HENV 660, HENV 665, HENV 670, HENV 675, HENV 680, or HENV 690.</li>
                 </ul>
-                <section>
-                <h3 id="sec6-1">6.1 Thesis Committee</h3>
+                                <h3 id="sec6-1">6.1 Thesis Committee</h3>
                 <p>A thesis committee must be formed by February of the first year in the program, and the student must provide the GPD and the GPA with the information on the members of their thesis committee. The committee is comprised of three members: the supervisor, and two other members who can contribute to the appropriate training of the student in the field of study. If there is a co-supervisor, the committee will have four members (two supervisors and two other members). Usually, one thesis committee member is based in another department and/or university. A member from outside the university would normally hold a Ph.D. degree.</p>
                 <p>The role of the thesis committee is:</p>
                 <ol>
@@ -329,8 +367,7 @@
                     <li>To evaluate the thesis proposal (HENV 810) and comprehensive exam (HENV 885).</li>
                     <li>To evaluate the final thesis and the oral defence, along with two additional thesis examiners: one internal examiner from a different department at Concordia, and one external examiner from a different university.</li>
                 </ol>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
-            </section>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
                 
                 <h3 id="sec6-2">6.2 Comprehensive Examination and Thesis Proposal</h3>
                 <p><strong>General Structure of the Comprehensive Examination</strong></p>
@@ -401,7 +438,7 @@
                 <ul>
                     <li><strong>Fall or winter term:</strong> Submit final thesis to the Thesis Office and prepare for thesis defense.&nbsp;</li>
                 </ul>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
 
             <section id="sec7">
@@ -446,7 +483,7 @@
                 <p><strong>M.Sc.</strong> - List of graduate courses, including electives offered by the department in the past: <a href="https://www.concordia.ca/academics/graduate/calendar/current/arts-and-science-courses/geography-planning-and-environment-courses.html#15658" target="_blank">M.Sc. Courses</a></p>
                 <p><strong>Ph.D.</strong> - List of graduate courses - including electives - offered by the department in the past: <a href="https://www.concordia.ca/academics/graduate/calendar/current/arts-and-science-courses/geography-planning-and-environment-courses.html#15658" target="_blank">Ph.D. Courses</a></p>
                 <p>To see which courses are available on a yearly basis, you can use the class schedule search tool available on myconcordia.ca</p>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
 
              <section id="sec8">
@@ -486,7 +523,7 @@
                 <p>Concordia requires that the Doctoral Thesis Examination Committee Form be submitted to the Thesis Office (thesis@concordia.ca) with a copy to our department GPA 6-8 weeks before the proposed defence date.</p>
                 <p>Doctoral theses can take the form of a traditional chapter-based, manuscript-based, and research-creation thesis. As a guideline, a typical traditional chapter-based Ph.D. thesis in our department is about 100,000 words (around 250 pages at 1.5 line spacing) while a research-creation and a manuscript-based Ph.D. thesis are more about 60,000 words (around 150 pages at 1.5 line spacing). These values can vary considerably depending on the project as well as on the importance given to the creative work in a research-creation investigation.</p>
                 <p>Details for thesis preparation can be found in the Thesis Preparation Guide: <a href="https://www.concordia.ca/content/dam/sgs/docs/handbooks/thesispreparationguide.pdf" target="_blank">Thesis Preparation Guide</a></p>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
            
             <section id="sec9">
@@ -526,14 +563,14 @@
                     <li>If you finish your degree in the Summer term, your convocation ceremony will take place in the Fall</li>
                     <li>If you finish your degree in either the Fall or Winter terms, your convocation ceremony will be in June.</li>
                 </ul>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
 
 			<section id="sec10">
                 <h2>10. Policy on Office Space for M.Sc. and Ph.D. Students</h2>
                 <p>The Department provides office space for research-based graduate students. Students working under the supervision of a faculty member with a research laboratory will be based in these lab spaces and will have space reserved for them within the respective lab. Faculty members are expected to provide computers for their labs.</p>
                 <p>Students not supervised by a faculty member with dedicated space will be assigned to shared spaces, with shared computers, within the graduate student rooms in the department. Office space and computer access are for a duration of 6 terms (2 years) for M.Sc. students and of 12 terms (4 years) for Ph.D. students.</p>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
 
             <section id="sec-index">
@@ -581,7 +618,7 @@
                     <div class="index-group">
                         <h3>G</h3>
                         <ul>
-                            <li><a href="#sec4.5">Generative Artificial Intelligence (AI)</a></li>
+                            <li><a href="#sec4.6">Generative Artificial Intelligence (AI)</a></li>
                             <li><a href="#sec1">Graduate Program Assistant (GPA)</a></li>
                             <li><a href="#sec1">Graduate Program Director (GPD)</a></li>
                             <li><a href="#sec9-1">Graduation Applications</a></li>
@@ -628,28 +665,93 @@
                         <ul>
                             <li><a href="#sec5-1">Thesis Committee (M.Sc.)</a></li>
                             <li><a href="#sec6-1">Thesis Committee (Ph.D.)</a></li>
-                            <li><a href="#sec6-4">Thesis Proposal</a></li>
+                            <li><a href="#sec6-2">Thesis Proposal</a></li>
                             <li><a href="#sec4.4">Time Limit</a></li>
                         </ul>
                     </div>
                 </div>
-                <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Back to top of page</button>
+                <button class="back-to-top" onclick="backToTop()">↑ Back to top of page</button>
             </section>
         </main>
     </div>
 
     <script>
-        function sendHeight() {
-            const height = document.body.scrollHeight;
-            window.parent.postMessage({ type: 'setAemIframeHeight', height: height }, '*');
+        /* =====================================================================
+           SCROLLING HELPERS (added Oct 2026)
+           On concordia.ca the iframe grows to the full height of this page
+           (iframe-resizer, loaded in <head>). That means THIS page no longer
+           scrolls - the concordia.ca page does. So every "jump" (contents
+           links, Back to top, search results) must ask the parent page to
+           scroll. window.parentIFrame is created by iframe-resizer when the
+           page is inside the Concordia iframe. When the page is opened
+           directly on GitHub, it does not exist and normal scrolling is used.
+           ===================================================================== */
+        const SCROLL_OFFSET = 20;   // space (px) left above a heading after a jump
+
+        function inResizedIframe() {
+            return typeof window.parentIFrame !== 'undefined' && window.parentIFrame !== null;
         }
 
-        window.addEventListener('load', sendHeight);
-        window.addEventListener('resize', sendHeight);
-        // If content changes dynamically inside the iframe, call sendHeight() afterwards
+        function pageTop(el) {
+            return el.getBoundingClientRect().top + window.scrollY;
+        }
 
+        // Scroll so that "el" is near the top of the visible screen
+        function scrollToElement(el, extraOffset) {
+            const offset = SCROLL_OFFSET + (extraOffset || 0);
+            const y = Math.max(0, pageTop(el) - offset);
+            if (inResizedIframe()) {
+                window.parentIFrame.scrollToOffset(0, y);
+            } else {
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+
+        function backToTop() {
+            if (inResizedIframe()) {
+                window.parentIFrame.scrollToOffset(0, 0);   // top of the handbook frame
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function isNarrowScreen() {
+            return window.matchMedia('(max-width: 900px)').matches;
+        }
+
+        // Make every in-page link (#sec1, #sec4.6, index links...) use the helper above
+        document.addEventListener('click', function (event) {
+            const link = event.target.closest('a[href^="#"]');
+            if (!link) return;
+            const id = decodeURIComponent(link.getAttribute('href').slice(1));
+            const target = document.getElementById(id);
+            if (!target) return;
+            event.preventDefault();
+            // On phones, close the Contents menu after a choice is made
+            const toc = document.getElementById('toc');
+            if (toc && isNarrowScreen() && toc.contains(link)) {
+                toc.open = false;
+            }
+            // Wait one frame so the page height is updated before scrolling
+            requestAnimationFrame(function () { scrollToElement(target); });
+        });
+
+        // Contents menu starts collapsed on phones, open on larger screens
+        document.addEventListener('DOMContentLoaded', function () {
+            const toc = document.getElementById('toc');
+            if (toc && isNarrowScreen()) toc.open = false;
+        });
+
+        /* =====================================================================
+           SEARCH
+           ===================================================================== */
         let currentMatches = [];
         let currentIndex = 0;
+
+        // Treat characters like . ( ) ? + as plain text, not search commands
+        function escapeRegExp(text) {
+            return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
 
         function executeSearch() {
             clearHighlightsInternal();
@@ -658,62 +760,127 @@
                 clearHighlights();
                 return;
             }
-            
+
             const contentArea = document.getElementById('content-area');
-            const regex = new RegExp(`(${term})`, 'gi');
-            
+            const regex = new RegExp(escapeRegExp(term), 'gi');
+
             walkAndHighlight(contentArea, regex);
-            
-            currentMatches = document.querySelectorAll('.highlight');
+
+            currentMatches = Array.from(document.querySelectorAll('.highlight'));
             if (currentMatches.length > 0) {
                 document.getElementById('nav-controls').style.display = 'flex';
-                currentIndex = 0; 
-                scrollAndFocus(); 
-                updateSearchInfo();
+                currentIndex = 0;
+                // Close the contents menu on phones so the results are easy to reach
+                const toc = document.getElementById('toc');
+                if (toc && isNarrowScreen()) toc.open = false;
+                scrollAndFocus();
             } else {
                 document.getElementById('nav-controls').style.display = 'none';
+                hideMatchBar();
             }
-            sendHeight();
+            updateSearchInfo();
         }
 
-        function walkAndHighlight(node, regex) {
-            if (node.nodeType === 3) { // Text node
-                const match = node.nodeValue.match(regex);
-                if (match) {
+        // Wrap every match in <span class="highlight"> without touching the page's HTML
+        function walkAndHighlight(root, regex) {
+            const textNodes = [];
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode: function (node) {
+                    const parent = node.parentNode;
+                    if (!parent || /^(SCRIPT|STYLE|BUTTON)$/i.test(parent.nodeName)) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    regex.lastIndex = 0;
+                    return regex.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            });
+            while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+            textNodes.forEach(function (node) {
+                const text = node.nodeValue;
+                const fragment = document.createDocumentFragment();
+                let last = 0;
+                regex.lastIndex = 0;
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    if (match.index > last) {
+                        fragment.appendChild(document.createTextNode(text.slice(last, match.index)));
+                    }
                     const span = document.createElement('span');
-                    span.innerHTML = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
-                    node.parentNode.replaceChild(span, node);
+                    span.className = 'highlight';
+                    span.textContent = match[0];
+                    fragment.appendChild(span);
+                    last = match.index + match[0].length;
                 }
-            } else if (node.nodeType === 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
-                for (let i = 0; i < node.childNodes.length; i++) {
-                    walkAndHighlight(node.childNodes[i], regex);
+                if (last < text.length) {
+                    fragment.appendChild(document.createTextNode(text.slice(last)));
                 }
-            }
+                node.parentNode.replaceChild(fragment, node);
+            });
         }
 
         function scrollAndFocus() {
             const el = currentMatches[currentIndex];
             el.classList.add('current');
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            placeMatchBar(el);
+            // Leave room above the match so it sits roughly a third of the way down the screen
+            scrollToElement(el, 150);
+            updateSearchInfo();
+        }
+
+        // Show the floating Prev / Next bar just below the current match
+        function placeMatchBar(el) {
+            const bar = document.getElementById('match-bar');
+            const content = document.getElementById('content-area');
+            bar.style.display = 'flex';
+            const rect = el.getBoundingClientRect();
+            const contentRect = content.getBoundingClientRect();
+            const barWidth = bar.offsetWidth;
+            let left = rect.left + window.scrollX;
+            const maxLeft = contentRect.right + window.scrollX - barWidth;
+            if (left > maxLeft) left = maxLeft;
+            if (left < 5) left = 5;
+            bar.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+            bar.style.left = left + 'px';
+        }
+
+        function hideMatchBar() {
+            document.getElementById('match-bar').style.display = 'none';
         }
 
         function updateSearchInfo() {
-            // Note: If you add an element with ID search-info, this function can show match counts.
+            const info = document.getElementById('search-info');
+            const count = document.getElementById('match-count');
+            const term = document.getElementById('search-input').value.trim();
+            if (!term) {
+                info.textContent = '';
+                count.textContent = '';
+            } else if (currentMatches.length === 0) {
+                info.textContent = 'No results for "' + term + '".';
+                count.textContent = '';
+            } else {
+                const label = (currentIndex + 1) + ' of ' + currentMatches.length;
+                info.textContent = currentMatches.length + ' result' + (currentMatches.length === 1 ? '' : 's') + ' (showing ' + label + ')';
+                count.textContent = label;
+            }
         }
 
         function clearHighlightsInternal() {
-            document.querySelectorAll('.highlight').forEach(h => {
-                const p = h.parentNode; 
-                p.replaceChild(document.createTextNode(h.textContent), h); 
+            document.querySelectorAll('.highlight').forEach(function (h) {
+                const p = h.parentNode;
+                p.replaceChild(document.createTextNode(h.textContent), h);
                 p.normalize();
             });
+            currentMatches = [];
+            currentIndex = 0;
         }
 
         function clearHighlights() {
             clearHighlightsInternal();
+            hideMatchBar();
             document.getElementById('nav-controls').style.display = 'none';
             document.getElementById('search-input').value = "";
-            sendHeight();
+            updateSearchInfo();
         }
 
         function jumpNext() {
@@ -729,6 +896,11 @@
             currentIndex = (currentIndex - 1 + currentMatches.length) % currentMatches.length;
             scrollAndFocus();
         }
+
+        // Keep the floating bar next to its match if the screen is resized or rotated
+        window.addEventListener('resize', function () {
+            if (currentMatches.length) placeMatchBar(currentMatches[currentIndex]);
+        });
     </script>
 	<script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -743,8 +915,15 @@
     });
 </script>
 
+<div id="match-bar" role="toolbar" aria-label="Search results">
+    <span id="match-count"></span>
+    <button onclick="jumpPrev()">&#9650; Prev</button>
+    <button onclick="jumpNext()">&#9660; Next</button>
+    <button onclick="clearHighlights()" aria-label="Close search">&#10005;</button>
+</div>
+
 <div class="version-tag">
-    <time datetime="2026-10-29">Updated Oct 29, 2026 Ver 8.9</time>
+    <time datetime="2026-10-29">Updated Oct 29, 2026 Ver 9.0</time>
 </div>
 		
 </body>
