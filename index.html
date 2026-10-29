@@ -637,8 +637,17 @@
             </section>
         </main>
     </div>
-		
+
     <script>
+        function sendHeight() {
+            const height = document.body.scrollHeight;
+            window.parent.postMessage({ type: 'setAemIframeHeight', height: height }, '*');
+        }
+
+        window.addEventListener('load', sendHeight);
+        window.addEventListener('resize', sendHeight);
+        // If content changes dynamically inside the iframe, call sendHeight() afterwards
+
         let currentMatches = [];
         let currentIndex = 0;
 
@@ -664,6 +673,7 @@
             } else {
                 document.getElementById('nav-controls').style.display = 'none';
             }
+            sendHeight();
         }
 
         function walkAndHighlight(node, regex) {
@@ -703,6 +713,7 @@
             clearHighlightsInternal();
             document.getElementById('nav-controls').style.display = 'none';
             document.getElementById('search-input').value = "";
+            sendHeight();
         }
 
         function jumpNext() {
@@ -733,7 +744,7 @@
 </script>
 
 <div class="version-tag">
-    <time datetime="2026-08-12">Updated Aug 12, 2026 Ver 8.8</time>
+    <time datetime="2026-10-29">Updated Oct 29, 2026 Ver 8.9</time>
 </div>
 		
 </body>
